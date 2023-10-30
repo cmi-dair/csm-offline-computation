@@ -8,7 +8,7 @@ from csm_offline import workbench
 
 
 @pytest.fixture()
-def mock_subprocess_run(mocker: plugin.MockerFixture) -> plugin.MockerFixture:
+def mock_subprocess_run(mocker: plugin.MockerFixture) -> plugin.MockType:
     """Return a mock subprocess.run function."""
     return mocker.patch("subprocess.run", autospec=True)
 
@@ -22,13 +22,13 @@ def workbench_instance(
 
 
 @pytest.fixture()
-def mock_logger_exception(mocker: plugin.MockerFixture) -> plugin.MockerFixture:
+def mock_logger_exception(mocker: plugin.MockerFixture) -> plugin.MockType:
     """Return a mock logger.exception function."""
     return mocker.patch("csm_offline.workbench.logger.exception", autospec=True)
 
 
 @pytest.fixture()
-def mock_is_workbench_available(mocker: plugin.MockerFixture) -> plugin.MockerFixture:
+def mock_is_workbench_available(mocker: plugin.MockerFixture) -> plugin.MockType:
     """A mock Workbench._is_workbench_available function that always returns True."""
     return mocker.patch.object(
         workbench.Workbench,
@@ -40,17 +40,17 @@ def mock_is_workbench_available(mocker: plugin.MockerFixture) -> plugin.MockerFi
 def test_multi_surface_to_volume_success(
     tmp_path: pathlib.Path,
     workbench_instance: workbench.Workbench,
-    mock_subprocess_run: plugin.MockerFixture,
-    mock_logger_exception: plugin.MockerFixture,
+    mock_subprocess_run: plugin.MockType,
+    mock_logger_exception: plugin.MockType,
 ) -> None:
     """Test successful run of multi_surface_to_volume."""
     metrics = [tmp_path / "metric1", tmp_path / "metric2"]
     surfaces = [tmp_path / "surface1", tmp_path / "surface2"]
     volume_space = [tmp_path / "volume_space"]
-    [test_file.touch() for test_file in metrics + surfaces + volume_space]
+    for test_file in metrics + surfaces + volume_space:
+        test_file.touch()
     volume_out = pathlib.Path("volume_out")
     distance = 3.0
-    mock_subprocess_run.return_value.check_returncode.return_value = None
     expected_workbench_calls = (
         5
     )  # 1 for volume math, 2 for surf2vol, 2 for check if workbench exists
@@ -68,7 +68,7 @@ def test_multi_surface_to_volume_success(
 
 
 def test_multi_surface_to_volume_mismatched_lengths(
-    mock_logger_exception: plugin.MockerFixture,
+    mock_logger_exception: plugin.MockType,
 ) -> None:
     """Test multi_surface_to_volume with mismatched lengths of metrics and surfaces."""
     metrics = [pathlib.Path("metric1")]
@@ -86,8 +86,8 @@ def test_multi_surface_to_volume_mismatched_lengths(
 
 def test_workbench_surface_to_volume_file_does_not_exist(
     workbench_instance: workbench.Workbench,
-    mock_logger_exception: plugin.MockerFixture,
-    mock_subprocess_run: plugin.MockerFixture,
+    mock_logger_exception: plugin.MockType,
+    mock_subprocess_run: plugin.MockType,
 ) -> None:
     """Test Workbench.surface_to_volume with a file that does not exist."""
     metric = pathlib.Path("metric")
@@ -112,8 +112,8 @@ def test_workbench_surface_to_volume_file_does_not_exist(
 def test_workbench_volume_math_file_exists(
     tmp_path: pathlib.Path,
     workbench_instance: workbench.Workbench,
-    mock_logger_exception: plugin.MockerFixture,
-    mock_subprocess_run: plugin.MockerFixture,
+    mock_logger_exception: plugin.MockType,
+    mock_subprocess_run: plugin.MockType,
 ) -> None:
     """Test Workbench.volume_math with an output file that already exists."""
     expression = "expression"
@@ -128,7 +128,7 @@ def test_workbench_volume_math_file_exists(
     assert mock_subprocess_run.call_count == 1  # Call to check if Workbench exists.
 
 
-def test_workbench_init_workbench_not_available(mocker: plugin.MockerFixture) -> None:
+def test_workbench_init_workbench_not_available(mocker: plugin.MockType) -> None:
     """Test initializing Workbench when the workbench toolkit is not available."""
     mocker.patch.object(
         workbench.Workbench,

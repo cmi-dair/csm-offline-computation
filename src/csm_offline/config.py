@@ -37,7 +37,7 @@ def get_settings() -> Settings:
         Settings: The settings for the CSM Offline application.
 
     """
-    return Settings()
+    return Settings()  # type: ignore[call-arg]
 
 
 def setup_logger(verbosity: str | int | None = None) -> None:
@@ -50,9 +50,7 @@ def setup_logger(verbosity: str | int | None = None) -> None:
     """
     settings = get_settings()
     logger = logging.getLogger(settings.LOGGER_NAME)
-    if verbosity:
-        if isinstance(verbosity, str):
-            verbosity = logging.getLevelName(verbosity.upper())
+    if verbosity is not None:
         logger.setLevel(verbosity)
 
     ch = logging.StreamHandler()

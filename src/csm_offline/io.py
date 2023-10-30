@@ -198,7 +198,12 @@ def load_user_data(*args: pathlib.Path) -> np.ndarray:
             logger.exception(message)
             raise FileNotFoundError(message)
         if filepath.suffix == ".gii":
-            data_arrays.append(nibabel.load(filepath).get_fdata())
+            image = nibabel.load(filepath)
+            if not isinstance(image, nibabel.gifti.gifti.GiftiImage):
+                message = f"File {filepath} is not a gifti file."
+                logger.exception(message)
+                raise ValueError(message)
+            data_arrays.append(image.darrays[0].data)
         else:
             # Fallback to loading as .txt file.
             data_arrays.append(np.loadtxt(filepath))

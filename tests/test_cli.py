@@ -14,9 +14,7 @@ def basic_arguments() -> list[str]:
     """Return a list of basic arguments."""
     return [
         "app-csm",
-        "--input-left",
         "/path/to/left",
-        "--input-right",
         "/path/to/right",
         "-o",
         "output_basename",

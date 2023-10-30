@@ -3,7 +3,7 @@ import logging
 import pathlib
 import subprocess
 import tempfile
-from collections.abc import Iterable
+from collections.abc import Sequence
 
 from csm_offline import config
 
@@ -14,8 +14,8 @@ WORKBENCH_PATH = settings.WORKBENCH_PATH
 
 
 def multi_surface_to_volume(
-    metrics: Iterable[pathlib.Path],
-    surfaces: Iterable[pathlib.Path],
+    metrics: Sequence[pathlib.Path],
+    surfaces: Sequence[pathlib.Path],
     volume_space: pathlib.Path,
     volume_out: pathlib.Path,
     distance: float = 3.0,
@@ -81,7 +81,7 @@ class Workbench:
         self,
         expression: str,
         volume_out: pathlib.Path,
-        volume_files: Iterable[pathlib.Path],
+        volume_files: Sequence[pathlib.Path],
     ) -> None:
         """Perform math on nifti volumes.
 
@@ -98,14 +98,14 @@ class Workbench:
         volume_files_arg = [
             f"-var x{i} {volume_file}" for i, volume_file in enumerate(volume_files)
         ]
-        volume_files_arg = " ".join(volume_files_arg)
+        volume_files_arg_str = " ".join(volume_files_arg)
         _logged_subprocess_run(
             [
                 self.executable,
                 "-volume-math",
                 expression,
                 str(volume_out),
-                volume_files_arg,
+                volume_files_arg_str,
             ],
         )
 

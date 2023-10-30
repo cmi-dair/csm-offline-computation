@@ -1,6 +1,7 @@
 """Entrypoint for the CSM Offline application."""
 import json
 import logging
+import pathlib
 import tempfile
 
 import numpy as np
@@ -38,15 +39,16 @@ def main() -> None:
         io.SurfaceFiles[f"{args.species.upper()}_RIGHT"].value,
     ]
     with tempfile.NamedTemporaryFile(suffix=".nii.gz") as volume_file:
+        temp_volume_path = pathlib.Path(volume_file.name)
         workbench.multi_surface_to_volume(
             [similarity.human_left, similarity.human_right],
             surfaces,
             io.VolumeFiles.MNI152.value,
-            volume_file.name,
+            temp_volume_path,
         )
 
         logger.info("Running NeuroQuery.")
-        neuroquery = image_search.search(volume_file.name, args.n_query_results)
+        neuroquery = image_search.search(temp_volume_path, args.n_query_results)
 
     logger.info("Saving output.")
     np.save(
