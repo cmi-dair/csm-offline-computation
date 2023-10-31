@@ -95,7 +95,7 @@ def save_output(
                 OUTPUT_DIR / f"{output_prefix}_{species}_{side}.surf.gii",
             )
     for dataframe_name in ("terms", "studies"):
-        neuroquery[dataframe_name].to_json(
+        neuroquery[dataframe_name].to_json(  # type: ignore[literal-required]
             OUTPUT_DIR / f"{output_prefix}_neuroquery_{dataframe_name}.json",
             orient="records",
             indent=4,

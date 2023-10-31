@@ -180,6 +180,6 @@ def test_gifti_file_content(tmp_path: pathlib.Path) -> None:
     io.array_to_gifti(array, file_path)
 
     gii_img = nibabel.load(file_path)
-    loaded_array = gii_img.darrays[0].data
+    loaded_array = gii_img.darrays[0].data  # type: ignore[attr-defined]
 
     np.testing.assert_array_equal(loaded_array, array, "Data should be the same.")

@@ -247,7 +247,7 @@ def _cosine_similarity(
 
 
 def array_to_gifti(
-    array: npt.ArrayLike,
+    array: np.ndarray,
     filepath: pathlib.Path,
     *,
     allow_cast: bool = True,
@@ -264,7 +264,7 @@ def array_to_gifti(
     logger.info("Saving array to %s.", filepath)
     image = nibabel.gifti.GiftiImage()
     if not allow_cast:
-        data_array = nibabel.gifti.GiftiDataArray(data=np.array(array))
+        data_array = nibabel.gifti.GiftiDataArray(data=array)
     elif np.issubdtype(array.dtype, np.integer):
         data_array = nibabel.gifti.GiftiDataArray(
             data=np.array(array),
