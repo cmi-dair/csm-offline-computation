@@ -47,11 +47,18 @@ def parse_arguments() -> argparse.Namespace:
         help="Basename of the output files.",
     )
     parser.add_argument(
-        "-q",
-        "--n_query_results",
-        default=10,
+        "-t",
+        "--n_terms",
+        default=100,
         type=int,
-        help="The number of results to return from the NeuroQuery image search.",
+        help="The number of terms to return from the NeuroQuery image search.",
+    )
+    parser.add_argument(
+        "-u",
+        "--n_studies",
+        default=100,
+        type=int,
+        help="The number of studies to return from the NeuroQuery image search.",
     )
     parser.add_argument(
         "-v",

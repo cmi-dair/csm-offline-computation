@@ -2,6 +2,7 @@
 import pathlib
 
 import h5py
+import nibabel
 import numpy as np
 import pytest
 from pytest_mock import plugin
@@ -160,3 +161,25 @@ def test_cosine_similarity_valid() -> None:
         expected,
         "Cosine similarity should be correctly calculated",
     )
+
+
+def test_array_to_gifti(tmp_path: pathlib.Path) -> None:
+    """Test if the function saves a gifti file successfully."""
+    array = np.array([[1, 2], [3, 4]], dtype=np.float32)
+    file_path = tmp_path / "output.gii"
+
+    io.array_to_gifti(array, file_path)
+
+    assert file_path.is_file()
+
+
+def test_gifti_file_content(tmp_path: pathlib.Path) -> None:
+    """Test if the gifti file contains correct data."""
+    array = np.array([[1, 2], [3, 4]], dtype=np.float32)
+    file_path = tmp_path / "output.gii"
+    io.array_to_gifti(array, file_path)
+
+    gii_img = nibabel.load(file_path)
+    loaded_array = gii_img.darrays[0].data
+
+    np.testing.assert_array_equal(loaded_array, array, "Data should be the same.")

@@ -1,10 +1,7 @@
 """Entrypoint for the CSM Offline application."""
-import json
 import logging
 import pathlib
 import tempfile
-
-import numpy as np
 
 from csm_offline import cli, config, image_search, io, workbench
 
@@ -33,28 +30,73 @@ def main() -> None:
     features = io.FeatureData.from_data_dir()
     similarity = features.feature_similarity(weights=user_data, species=args.species)
 
-    logger.info("Running surface to volume.")
+    logger.info("Computing Neuroquery terms and studies.")
+    neuroquery = run_neuroquery(similarity, args.species, args.n_terms, args.n_studies)
+
+    logger.info("Saving output.")
+    save_output(similarity, neuroquery, args.output)
+
+
+def run_neuroquery(
+    similarity: io.FeatureData,
+    species: str,
+    n_terms: int,
+    n_studies: int,
+) -> image_search.ImageSearchResult:
+    """Run a neuroquery search using the given similarity data from the given species.
+
+    Args:
+        similarity: The similarity data to use for the search.
+        species: The species to use for the search.
+        n_terms: The number of terms to return in the search results.
+        n_studies: The number of studies to return in the search results.
+
+    Returns:
+        image_search.ImageSearchResult: The result of the neuroquery search.
+    """
     surfaces = [
-        io.SurfaceFiles[f"{args.species.upper()}_LEFT"].value,
-        io.SurfaceFiles[f"{args.species.upper()}_RIGHT"].value,
+        io.SurfaceFiles[f"{species.upper()}_LEFT"].value,
+        io.SurfaceFiles[f"{species.upper()}_RIGHT"].value,
     ]
-    with tempfile.NamedTemporaryFile(suffix=".nii.gz") as volume_file:
-        temp_volume_path = pathlib.Path(volume_file.name)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_volume_path = pathlib.Path(temp_dir) / "volume.nii.gz"
+        temp_surface_left_path = pathlib.Path(temp_dir) / "surface_left.surf.gii"
+        temp_surface_right_path = pathlib.Path(temp_dir) / "surface_right.surf.gii"
+
+        io.array_to_gifti(similarity.human_left, temp_surface_left_path)
+        io.array_to_gifti(similarity.human_right, temp_surface_right_path)
+
         workbench.multi_surface_to_volume(
-            [similarity.human_left, similarity.human_right],
+            [temp_surface_left_path, temp_surface_right_path],
             surfaces,
             io.VolumeFiles.MNI152.value,
             temp_volume_path,
         )
 
-        logger.info("Running NeuroQuery.")
-        neuroquery = image_search.search(temp_volume_path, args.n_query_results)
+        return image_search.search(temp_volume_path, n_terms, n_studies)
 
-    logger.info("Saving output.")
-    np.save(
-        OUTPUT_DIR / f"{args.output}_similarity_human.npy",
-        similarity.human,
-    )
-    np.save(OUTPUT_DIR / f"{args.output}_similarity_macaque.npy", similarity.macaque)
-    with (OUTPUT_DIR / f"{args.output}_neuroquery.json").open("w") as file_buffer:
-        json.dump(neuroquery, file_buffer)
+
+def save_output(
+    similarity: io.FeatureData,
+    neuroquery: image_search.ImageSearchResult,
+    output_prefix: str,
+) -> None:
+    """Save the output of the CSM offline computation to disk.
+
+    Args:
+        similarity: The similarity data to save.
+        neuroquery: The neuroquery data to save.
+        output_prefix: The prefix to use for the output filenames.
+    """
+    for species in ("human", "macaque"):
+        for side in ("left", "right"):
+            io.array_to_gifti(
+                getattr(similarity, f"{species}_{side}"),
+                OUTPUT_DIR / f"{output_prefix}_{species}_{side}.surf.gii",
+            )
+    for dataframe_name in ("terms", "studies"):
+        neuroquery[dataframe_name].to_json(
+            OUTPUT_DIR / f"{output_prefix}_neuroquery_{dataframe_name}.json",
+            orient="records",
+            indent=4,
+        )

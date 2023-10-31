@@ -6,6 +6,7 @@ import pathlib
 import h5py
 import nibabel
 import numpy as np
+from nibabel.gifti import gifti
 from numpy import typing as npt
 
 from csm_offline import config
@@ -122,12 +123,17 @@ class FeatureData:
         logger.debug("Calculating feature similarity.")
         species_data = getattr(self, species)
         user_feature = np.average(species_data, weights=weights, axis=0)
-        similarity = _cosine_similarity(np.atleast_2d(user_feature), self.all_data)
+        similarity = _cosine_similarity(
+            np.atleast_2d(user_feature),
+            self.all_data,
+        ).squeeze()
         return FeatureData(
-            similarity[: len(self.human_left)],
-            similarity[len(self.human_left) : len(self.human)],
-            similarity[len(self.human) : len(self.macaque_left)],
-            similarity[len(self.macaque_left) :],
+            similarity[: self.human_left.shape[0]],
+            similarity[self.human_left.shape[0] : self.human.shape[0]],
+            similarity[
+                self.human.shape[0] : (self.human.shape[0] + self.macaque_left.shape[0])
+            ],
+            similarity[(self.human.shape[0] + self.macaque_left.shape[0]) :],
         )
 
     @staticmethod
@@ -199,7 +205,7 @@ def load_user_data(*args: pathlib.Path) -> np.ndarray:
             raise FileNotFoundError(message)
         if filepath.suffix == ".gii":
             image = nibabel.load(filepath)
-            if not isinstance(image, nibabel.gifti.gifti.GiftiImage):
+            if not isinstance(image, gifti.GiftiImage):
                 message = f"File {filepath} is not a gifti file."
                 logger.exception(message)
                 raise ValueError(message)
@@ -238,3 +244,41 @@ def _cosine_similarity(
     cosine_similarity[cosine_similarity < -threshold] = -threshold
     cosine_similarity[np.isnan(cosine_similarity)] = 0
     return cosine_similarity
+
+
+def array_to_gifti(
+    array: npt.ArrayLike,
+    filepath: pathlib.Path,
+    *,
+    allow_cast: bool = True,
+) -> None:
+    """Save an array as a gifti file.
+
+    Args:
+        array: The array to save.
+        filepath: The path to the output file.
+        allow_cast: Whether to allow casting the array to a type compatible with
+            gifti files.
+
+    """
+    logger.info("Saving array to %s.", filepath)
+    image = nibabel.gifti.GiftiImage()
+    if not allow_cast:
+        data_array = nibabel.gifti.GiftiDataArray(data=np.array(array))
+    elif np.issubdtype(array.dtype, np.integer):
+        data_array = nibabel.gifti.GiftiDataArray(
+            data=np.array(array),
+            datatype="NIFTI_TYPE_INT32",
+        )
+    elif np.issubdtype(array.dtype, np.floating):
+        data_array = nibabel.gifti.GiftiDataArray(
+            data=np.array(array),
+            datatype="NIFTI_TYPE_FLOAT32",
+        )
+    else:
+        message = f"Array of type {array.dtype} cannot be saved as a gifti file."
+        logger.exception(message)
+        raise TypeError(message)
+
+    image.add_gifti_data_array(data_array)
+    nibabel.save(image, filepath)

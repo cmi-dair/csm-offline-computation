@@ -34,7 +34,8 @@ def test_parse_valid_arguments(
     assert args.input_right == pathlib.Path("/path/to/right")
     assert args.output == "output_basename"
     assert args.species == "human"
-    assert args.n_query_results == 10  # noqa: PLR2004
+    assert args.n_terms == 100  # noqa: PLR2004
+    assert args.n_studies == 100  # noqa: PLR2004
     assert args.verbosity is None
 
 

@@ -20,16 +20,17 @@ def mock_neuroquery(mocker: plugin.MockerFixture) -> plugin.MockerFixture:
     return mocker.patch(
         "csm_offline.image_search.neuroquery_image_search.NeuroQueryImageSearch",
         autospec=True,
-        return_value=lambda image_path, results: template_output,
+        return_value=lambda image_path, n_studies, n_terms: template_output,
     )
 
 
 def test_search_valid_input(mock_neuroquery: plugin.MockerFixture) -> None:
     """Test the search function with valid input."""
     image_path = pathlib.Path("/path/to/image")
-    n_results = 1
+    n_studies = 1
+    n_terms = 1
     expected = template_output
 
-    result = image_search.search(image_path, n_results)
+    result = image_search.search(image_path, n_studies, n_terms)
 
     assert result == expected

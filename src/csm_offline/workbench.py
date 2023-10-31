@@ -51,11 +51,11 @@ def multi_surface_to_volume(
             )
             volume_files.append(volume_file)
 
-    average_expression = "({}) / {}".format(
-        " + ".join(f"x{i}" for i in range(len(volume_files))),
-        len(volume_files),
-    )
-    wb.volume_math(average_expression, volume_out, volume_files)
+        average_expression = "({}) / {}".format(
+            " + ".join(f"x{i}" for i in range(len(volume_files))),
+            len(volume_files),
+        )
+        wb.volume_math(average_expression, volume_out, volume_files)
 
 
 class Workbench:
@@ -98,14 +98,14 @@ class Workbench:
         volume_files_arg = [
             f"-var x{i} {volume_file}" for i, volume_file in enumerate(volume_files)
         ]
-        volume_files_arg_str = " ".join(volume_files_arg)
+        volume_files_arg_list = " ".join(volume_files_arg).split()
         _logged_subprocess_run(
             [
                 self.executable,
                 "-volume-math",
                 expression,
                 str(volume_out),
-                volume_files_arg_str,
+                *volume_files_arg_list,
             ],
         )
 
@@ -139,8 +139,8 @@ class Workbench:
                 "-metric-to-volume-mapping",
                 str(metric),
                 str(surface),
-                str(volume_out),
                 str(volume_space),
+                str(volume_out),
                 "-nearest-vertex",
                 str(distance),
             ],

@@ -35,12 +35,18 @@ class ImageSearchResult(TypedDict):
     terms: pd.DataFrame
 
 
-def search(image_path: pathlib.Path, n_results: int = 10) -> ImageSearchResult:
+def search(
+    image_path: pathlib.Path,
+    n_terms: int = 10,
+    n_studies: int = 10,
+) -> ImageSearchResult:
     """Search for images similar to the given image.
 
     Args:
         image_path: The path to the image to search for.
-        n_results: The number of results to return.
+        n_terms: The number of terms to return from the search.
+        n_studies: The number of studies to return from the search.
+
 
     Returns:
         list[dict]: The results of the search.
@@ -48,4 +54,4 @@ def search(image_path: pathlib.Path, n_results: int = 10) -> ImageSearchResult:
     """
     logger.info("Running NeuroQuery Image Search for %s", image_path)
     neuroquery = neuroquery_image_search.NeuroQueryImageSearch()
-    return neuroquery(image_path, n_results)
+    return neuroquery(image_path, n_studies=n_studies, n_terms=n_terms)
