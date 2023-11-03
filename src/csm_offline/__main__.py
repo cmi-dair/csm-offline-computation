@@ -92,7 +92,7 @@ def save_output(
         for side in ("left", "right"):
             io.array_to_gifti(
                 getattr(similarity, f"{species}_{side}"),
-                OUTPUT_DIR / f"{output_prefix}_{species}_{side}.surf.gii",
+                OUTPUT_DIR / f"{output_prefix}_{species}_{side}.func.gii",
             )
     for dataframe_name in ("terms", "studies"):
         neuroquery[dataframe_name].to_json(  # type: ignore[literal-required]
