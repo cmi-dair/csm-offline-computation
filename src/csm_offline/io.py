@@ -24,7 +24,7 @@ class VolumeFiles(enum.Enum):
 
     """
 
-    MNI152: pathlib.Path = DATA_DIR / "MNI152_template.nii.gz"
+    MNI152: pathlib.Path = DATA_DIR / "mni152_template.nii.gz"
 
 
 class FeatureFiles(enum.Enum):
