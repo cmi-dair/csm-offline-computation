@@ -33,4 +33,41 @@ docker run \
 
 Replace /path/to/your/input and /path/to/your/output with the paths to your input and output directories, respectively. For an up-to-date usage, including all possible parameters, see `docker run cmidair/interspeciesmap -h`. 
 
+### Decoding from Neuroquery Terms
 
+We can also decode directly from neuroquery terms. To do so, run the following commands. First in Python we create the volumetric neuroquery image.
+
+```python
+import nibabel
+import neuroquery
+
+model = neuroquery.fetch_neuroquery_model()
+encoder = neuroquery.NeuroQueryModel.from_data_dir(model)
+query = "default mode"
+result = encoder(query)
+
+nibabel.save('my/volume/file.nii.gz', result["brain_map"])
+```
+
+Then in Bash we create the surface files and run the rest of the code. Note that you need Workbench tools installed for this.
+```bash
+wb_command \
+  -volume-to-surface-mapping \
+  "my/volume/file.nii.gz" \
+  "my/left_surface.gii" \
+  "my_left_output.gii" \
+  -trilinear
+wb_command \
+  -volume-to-surface-mapping \
+  "my/volume/file.nii.gz" \
+  "my/right_surface.gii" \
+  "my_right_output.gii" \
+  -trilinear
+
+docker run \
+  --volume /my/volume:/input \
+  --volume /path/to/your/output:/output \
+  cmidair/interspeciesmap \
+  my_left_output.gii \
+  my_right_output.gii
+```
