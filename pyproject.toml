@@ -10,7 +10,7 @@ packages = [{include = "csm_offline", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.11, <3.13"
 h5py = "^3.10.0"
-numpy = "^1.26.1"
+numpy = "^1.26.2"
 nibabel = "^5.1.0"
 neuroquery-image-search = "^0.1"
 pydantic-settings = "^2.0.3"
