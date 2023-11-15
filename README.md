@@ -1,11 +1,9 @@
-# Project name
-
+# CSM Offline Computation
 [![Build](https://github.com/cmi-dair/csm-offline-computation/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/cmi-dair/csm-offline-computation/actions/workflows/test.yaml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/cmi-dair/csm-offline-computation/branch/main/graph/badge.svg?token=22HWWFWPW5)](https://codecov.io/gh/cmi-dair/csm-offline-computation)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![stability-wip](https://img.shields.io/badge/stability-work_in_progress-lightgrey.svg)
 [![L-GPL License](https://img.shields.io/badge/license-L--GPL_2.1-blue.svg)](https://github.com/cmi-dair/csm-offline-computation/blob/main/LICENSE)
-# CSM Offline Computation
 
 CSM Offline is a command-line tool designed for processing data in a manner similar to the [Cross Species Mapper](https://interspeciesmap.childmind.org/). It allows users to load data, calculate feature similarity, run NeuroQuery image searches, and save the output to disk.
 
@@ -31,7 +29,7 @@ docker run \
   right_hemispheric_filename.gii
 ```
 
-Replace /path/to/your/input and /path/to/your/output with the paths to your input and output directories, respectively. For an up-to-date usage, including all possible parameters, see `docker run cmidair/interspeciesmap -h`. 
+Replace /path/to/your/input and /path/to/your/output with the paths to your input and output directories, respectively. For an up-to-date usage, including all possible parameters, see `docker run cmidair/interspeciesmap -h`. Note that the gifti surfaces have to match the 10k FS-LR surfaces used in the Cross Species Mapper. 
 
 ### Decoding from Neuroquery Terms
 
