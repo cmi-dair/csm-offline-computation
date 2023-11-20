@@ -14,7 +14,7 @@ numpy = "^1.26.1"
 nibabel = "^5.1.0"
 neuroquery-image-search = "^0.1"
 pydantic-settings = "^2.0.3"
-pydantic = "^2.4.2"
+pydantic = "^2.5.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
