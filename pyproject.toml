@@ -13,7 +13,7 @@ h5py = "^3.10.0"
 numpy = "^1.26.1"
 nibabel = "^5.1.0"
 neuroquery-image-search = "^0.1"
-pydantic-settings = "^2.0.3"
+pydantic-settings = "^2.1.0"
 pydantic = "^2.4.2"
 
 [tool.poetry.group.dev.dependencies]
